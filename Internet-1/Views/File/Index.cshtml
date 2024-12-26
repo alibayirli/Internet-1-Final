@@ -1,0 +1,71 @@
+﻿@{
+    Layout = "_LayoutAdmin";
+}
+@model Internet_1.ViewModels.FileUploadViewModel
+@section CardHeader {
+    <span>Dosyalar</span>
+}
+
+
+
+<div class="col-md-12">
+    <form method="post" asp-action="UploadFile" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="FileName">Dosya</label>
+                <input type="file" name="file" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Description">Açıklama</label>
+                <input type="text" asp-for="Description" class="form-control" />
+            </div>
+            <div class="col-md-6 mt-3">
+                <button type="submit" class="btn btn-primary">Dosya Yükle</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (Model.SystemFiles.Count == 0)
+{
+    <caption>Herhangi bir dosya yüklü değil</caption>
+}
+<table class="table m-3">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Id)</th>
+            <th>Dosya Adı</th>
+            <th>Dosya Tipi</th>
+            <th>Dosya Uzantısı</th>
+            <th>Açıklama</th>
+            <th>Yükleme Tarihi</th>
+            <th class="text-center">İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int siraNo = 1;
+        }
+        @foreach (var file in Model.SystemFiles)
+        {
+            <tr>
+                <td class="text-center">@(siraNo++)</td>
+                <td>@file.FileName</td>
+                <td>@file.FileType</td>
+                <td>@file.Extension</td>
+                <td>@file.Description</td>
+                <td>@file.UploadOn</td>
+                <td class="text-center">
+                    <a asp-action="Download" asp-route-id="@file.Id" class="btn btn-primary btn-sm">İndir</a>
+                    <form asp-action="DeleteFile" method="post" style="display: inline;">
+                        <input type="hidden" name="id" value="@file.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Bu dosyayı silmek istediğinizden emin misiniz?');">
+                            Sil
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

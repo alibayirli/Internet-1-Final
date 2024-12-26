@@ -1,0 +1,69 @@
+﻿@{
+    Layout = "_LayoutAdmin";
+}
+
+<h1 class="h3 mb-4 text-gray-800">Admin Sayfası</h1>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            <a asp-controller="File" asp-action="Index">Dosyalar</a>
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="fileCount">0</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div id="divResult"></div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+
+@section Scripts {
+    <script>
+        var connectionHub = new signalR.HubConnectionBuilder()
+            .withUrl("/general-hub", signalR.HttpTransportType.WebSockets)
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        // Dosya sayısı güncellemesi için handler
+        connectionHub.on("onFileCountUpdate", (count) => {
+            $("#fileCount").html(count);
+            $("#divResult")
+                .show()
+                .removeClass()
+                .addClass("alert alert-info")
+                .html("Dosya sayısı güncellendi")
+                .fadeOut(5000);
+        });
+
+        // Bağlantı başlatma
+        function fullfilled() {
+            console.log("Bağlantı Başarılı");
+            // Sayfa yüklendiğinde initial dosya sayısını al
+            $.get("/File/GetFileCount", function(count) {
+                $("#fileCount").html(count);
+            });
+        }
+
+        function rejected() {
+            console.log("Bağlantı Hatalı");
+        }
+
+        connectionHub.start().then(fullfilled, rejected);
+    </script>
+}

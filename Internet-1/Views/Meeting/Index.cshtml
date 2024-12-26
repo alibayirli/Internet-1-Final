@@ -1,0 +1,186 @@
+﻿@{
+    ViewData["Title"] = "Toplantılar";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@section CardHeader {
+    <span>Toplantılar</span>
+}
+<div class="row">
+    <div class="col-md-8">
+        <table class="table" id="tbMeetings">
+            <thead>
+                <tr>
+                    <th>Başlık</th>
+                    <th>Açıklama</th>
+                    <th>Tarih</th>
+                    <th>Saat</th>
+                    <th>Düzenle</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4">
+        <h5 id="editTitle">Yeni Toplantı</h5>
+        <div class="mb-3">
+            <label>Başlık</label>
+            <input type="text" class="form-control" id="txtTitle" />
+            <input type="hidden" id="txtId" />
+        </div>
+        <div class="mb-3">
+            <label>Açıklama</label>
+            <textarea rows="3" class="form-control" id="txtDescription"></textarea>
+        </div>
+        <div class="mb-3">
+            <label>Tarih</label>
+            <input type="date" class="form-control" id="txtDate" />
+        </div>
+        <div class="mb-3">
+            <label>Saat</label>
+            <input type="time" class="form-control" id="txtTime" />
+        </div>
+        <div class="mb-3">
+            <button class="btn btn-primary btn-sm" id="btnSave">Kaydet</button>
+            <button class="btn btn-secondary btn-sm" id="btnCancel">Vazgeç</button>
+            <button class="btn btn-danger btn-sm" id="btnDelete">Sil</button>
+        </div>
+
+        <div id="divResult"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        GetMeetingList();
+        $("#btnCancel").hide();
+        $("#btnDelete").hide();
+        $("#txtId").val(0);
+
+        $("#btnSave").click(function () {
+            id = $("#txtId").val();
+            title = $("#txtTitle").val();
+            description = $("#txtDescription").val();
+            date = $("#txtDate").val();
+            time = $("#txtTime").val();
+
+            var meeting = {
+                Id: id,
+                Title: title,
+                Description: description,
+                MeetingDate: date,
+                MeetingTime: time
+            };
+
+            $.ajax({
+                url: "/Meeting/AddUpdateAjax",
+                type: "POST",
+                data: meeting,
+                success: function (d) {
+                    if (d.status) {
+                        GetMeetingList();
+                        $("#btnCancel").click();
+                        $("#divResult")
+                            .show()
+                            .removeClass()
+                            .addClass("alert alert-success")
+                            .html(d.message)
+                            .fadeOut(3000);
+                    } else {
+                        $("#divResult")
+                            .show()
+                            .removeClass()
+                            .addClass("alert alert-danger")
+                            .html(d.message)
+                            .fadeOut(3000);
+                    }
+                },
+                error: function (e) { },
+            });
+        });
+
+        $(document).on("click", ".edit", function () {
+            var id = $(this).attr("data-id");
+            $("#editTitle").html("Toplantı Düzenle");
+            $("#btnCancel").show();
+            $("#btnDelete").show();
+            $.ajax({
+                url: "/Meeting/GetByIdAjax/" + id,
+                type: "GET",
+                success: function (d) {
+                    $("#txtId").val(id);
+                    $("#txtTitle").val(d.title);
+                    $("#txtDescription").val(d.description);
+                    $("#txtDate").val(d.meetingDate);
+                    $("#txtTime").val(d.meetingTime);
+                },
+                error: function (e) { },
+            });
+        });
+
+        $("#btnCancel").click(function () {
+            $("#editTitle").html("Yeni Toplantı");
+            $("#btnCancel").hide();
+            $("#btnDelete").hide();
+            $("#txtId").val(0);
+            $("#txtTitle").val("");
+            $("#txtDescription").val("");
+            $("#txtDate").val("");
+            $("#txtTime").val("");
+        });
+
+        $("#btnDelete").click(function () {
+            var id = $("#txtId").val();
+            $.ajax({
+                url: "/Meeting/DeleteAjax/" + id,
+                type: "GET",
+                success: function (d) {
+                    if (d.status) {
+                        GetMeetingList();
+                        $("#btnCancel").click();
+                        $("#divResult")
+                            .show()
+                            .removeClass()
+                            .addClass("alert alert-success")
+                            .html(d.message)
+                            .fadeOut(3000);
+                    } else {
+                        $("#divResult")
+                            .show()
+                            .removeClass()
+                            .addClass("alert alert-danger")
+                            .html(d.message)
+                            .fadeOut(3000);
+                    }
+                },
+                error: function (e) { },
+            });
+        });
+
+        function GetMeetingList() {
+            $.ajax({
+                url: "/Meeting/ListAjax",
+                type: "GET",
+                success: function (d) {
+                    MeetingToTable(d)
+                },
+                error: function (e) { },
+            });
+        }
+
+        function MeetingToTable(data) {
+            $("#tbMeetings tbody").empty();
+            var rows = "";
+            $.each(data, function (i, item) {
+                rows += "<tr>";
+                rows += "<td>" + item.title + "</td>";
+                rows += "<td>" + item.description + "</td>";
+                rows += "<td>" + item.meetingDate + "</td>";
+                rows += "<td>" + item.meetingTime + "</td>";
+                rows += "<td><button class='btn btn-primary btn-sm edit' data-id='" + item.id + "'>Düzenle</button></td>";
+                rows += "</tr>";
+            });
+            $("#tbMeetings tbody").append(rows);
+        }
+    </script>
+}
