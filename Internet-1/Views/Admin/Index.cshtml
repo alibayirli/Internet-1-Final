@@ -40,7 +40,7 @@
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
-        // Dosya sayısı güncellemesi için handler
+
         connectionHub.on("onFileCountUpdate", (count) => {
             $("#fileCount").html(count);
             $("#divResult")

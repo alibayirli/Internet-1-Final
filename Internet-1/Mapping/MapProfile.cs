@@ -8,7 +8,6 @@ namespace Internet_1.Mapping
     {
         public MapProfile()
         {
-            CreateMap<Category, CategoryModel>().ReverseMap();
             CreateMap<AppUser, UserModel>().ReverseMap();
             CreateMap<AppUser, RegisterModel>().ReverseMap();
 
@@ -19,7 +18,7 @@ namespace Internet_1.Mapping
                 .ForMember(dest => dest.MeetingTime,
                           opt => opt.MapFrom(src => src.MeetingTime.ToString(@"hh\:mm")));
 
-            // Ters yöndeki mapping için (MeetingModel'den Meeting'e)
+            
             CreateMap<MeetingModel, Meeting>()
                 .ForMember(dest => dest.MeetingDate,
                           opt => opt.MapFrom(src => DateTime.Parse(src.MeetingDate)))

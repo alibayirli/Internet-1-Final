@@ -15,7 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddScoped<MeetingRepository>();
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<CategoryRepository>();
 builder.Services.AddScoped(typeof(GenericRepository<>));
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
@@ -67,7 +66,7 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -79,7 +78,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication(); // Bunu ekleyin
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllerRoute(

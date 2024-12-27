@@ -70,7 +70,7 @@ namespace Internet_1.Controllers
 
                 return View(model);
             }
-            // default olarak Uye rolü ekleme
+
             var user1 = await _userManager.FindByNameAsync(model.UserName);
             var roleExist = await _roleManager.RoleExistsAsync("Uye");
             if (!roleExist)

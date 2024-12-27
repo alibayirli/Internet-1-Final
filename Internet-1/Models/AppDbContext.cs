@@ -5,7 +5,6 @@ namespace Internet_1.Models
 {
     public class AppDbContext : IdentityDbContext<AppUser, AppRole, string>
     {
-        public DbSet<Category> Categories { get; set; }
 
         public DbSet<FileModal> Files { get; set; }
         public DbSet<Meeting> Meetings { get; set; }
